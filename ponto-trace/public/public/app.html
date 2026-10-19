@@ -46,15 +46,22 @@ button,.btn{border-radius:10px}input,select,textarea{border-radius:10px}input:fo
 .scan{border-radius:14px;font-size:22px;letter-spacing:.04em}
 .hint{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 12px;max-width:760px}.hint button{white-space:nowrap}
 dialog{border-radius:16px}video{width:100%;border-radius:10px;background:#000}
-.ml,.mo{display:none}
+.mbar,.bk,.cl{display:none}
 @media (max-width:760px){
 .app{display:block}
-nav{position:sticky;top:0;z-index:20;height:auto;flex-direction:row;flex-wrap:nowrap;align-items:center;overflow-x:auto;gap:4px;padding:8px;padding-top:calc(8px + env(safe-area-inset-top,0px));border-right:0;border-bottom:1px solid var(--bd);background:var(--pn);-webkit-overflow-scrolling:touch}
-nav .logo,nav .who{display:none}
-.ml{display:flex;flex:0 0 auto;padding:0 10px 0 4px}.ml img{display:block;height:30px;width:auto;max-width:none}
-nav button{flex:0 0 auto;white-space:nowrap;padding:10px 14px;min-height:44px}
-nav button.on{background:var(--bd);box-shadow:inset 0 -3px var(--ac)}
-.mo{display:block;border:1px solid var(--bd);margin-left:6px}
+.mbar{display:flex;align-items:center;gap:4px;position:sticky;top:0;z-index:20;background:var(--pn);border-bottom:1px solid var(--bd);padding:6px 12px 6px 6px;padding-top:calc(6px + env(safe-area-inset-top,0px))}
+.hb{background:transparent;border:0;box-shadow:none;color:var(--tx);width:46px;padding:0;display:flex;align-items:center;justify-content:center}
+.ml{display:flex;padding:0 6px}.ml img{display:block;height:30px;width:auto;max-width:none}
+.mt{margin-left:auto;font-weight:650;font-size:15px;color:var(--mu)}
+.bk{display:block;position:fixed;inset:0;background:rgba(0,0,0,.62);opacity:0;pointer-events:none;transition:opacity .25s;z-index:40}
+.app.open .bk{opacity:1;pointer-events:auto}
+nav{position:fixed;top:0;bottom:0;left:0;height:auto;width:min(86vw,340px);z-index:50;flex-direction:column;align-items:stretch;gap:0;overflow-y:auto;transform:translateX(-102%);transition:transform .28s ease;border-right:1px solid var(--bd);border-bottom:0;background:var(--pn);padding:calc(22px + env(safe-area-inset-top,0px)) 24px calc(22px + env(safe-area-inset-bottom,0px))}
+.app.open nav{transform:none}
+nav .logo{display:block;padding:0 0 22px}nav .logo img{max-width:170px}
+nav .cl{display:block;position:absolute;top:calc(10px + env(safe-area-inset-top,0px));right:8px;width:46px;background:transparent;color:var(--tx);box-shadow:none;border:0;font-size:22px;padding:0}
+nav>button:not(.cl){font-size:24px;font-weight:700;letter-spacing:-.01em;padding:15px 0;min-height:0;border-bottom:1px solid var(--bd);border-radius:0;color:var(--tx);text-align:left;white-space:normal;flex:none}
+nav>button.on{background:none;box-shadow:none;color:var(--ac)}
+nav .who{display:block;margin-top:auto;padding-top:22px}
 main{padding:14px 14px calc(24px + env(safe-area-inset-bottom,0px))}
 h2{font-size:22px}
 .grid{grid-template-columns:repeat(2,1fr);gap:10px}.card .n{font-size:28px}
@@ -119,10 +126,11 @@ hist(){const f=db.movements.filter(m=>(!H.emp||m.employee_id===H.emp)&&(!H.from|
  return`<h2>Relatórios</h2><div class="bar"><label>Funcionário<select onchange="H.emp=this.value;render()"><option value="">Todos</option>${db.employees.map(e=>`<option value="${e.id}" ${H.emp===e.id?'selected':''}>${esc(e.full_name)}</option>`).join('')}</select></label><label>De<input type="date" value="${H.from}" onchange="H.from=this.value;render()"></label><label>Até<input type="date" value="${H.to}" onchange="H.to=this.value;render()"></label></div><div class="bar"><button class="g" onclick="exp('inv')">Exportar inventário</button><button class="g" onclick="exp('loan')">Exportar emprestadas</button><button class="g" onclick="exp('mov')">Exportar movimentações</button></div><h3>Emprestadas agora</h3>${tbl(['Ferramenta','Responsável'],db.tools.filter(t=>t.status==='loaned').map(t=>[esc(t.unique_id+' '+t.name),esc(by(db.employees,t.holder).full_name)]))}<h3>Movimentações</h3>${tbl(MH,movRows(f))}`},
 users(){return`<h2>Usuários</h2><p class="mu">Quem pode entrar no sistema. Administrador faz tudo, operador faz retiradas e devoluções, consulta só visualiza.</p><div class="bar"><button onclick="userForm()">Novo usuário</button></div>`+tbl(['Usuário','Nome','Perfil','Situação',''],db.users.map(x=>[`<b>${esc(x.username)}</b>`,esc(x.full_name),RO[x.role],x.active?'<span class="b ok">Ativo</span>':'<span class="b er">Inativo</span>',`<div class="acts"><button class="s g" onclick="userForm('${x.id}')">Editar</button>${x.id===me.id?'':`<button class="s r" onclick="tog('users','${x.id}')">${x.active?'Inativar':'Reativar'}</button>`}</div>`]))},
 audit(){return`<h2>Trilha de auditoria</h2><p class="mu">Registros não podem ser editados nem excluídos.</p>`+tbl(['Data','Usuário','Ação','Alvo','Detalhes'],db.audit.slice().reverse().map(a=>[fmt(a.timestamp),esc(by(db.users,a.user_id).username),`<span class="b ac">${esc(a.action)}</span>`,esc(a.target_entity),esc(a.details)]))}};
-function render(){const A=$('#app');
+function mn(o){$('.app').classList.toggle('open',!!o);document.body.style.overflow=o?'hidden':''}
+function render(){const A=$('#app');document.body.style.overflow='';
  if(!me){A.innerHTML=loginHTML();$('#lf').onsubmit=async e=>{e.preventDefault();try{await api('/api/login',{username:$('#lu').value.trim(),password:$('#lp').value});await load();view='dash';render()}catch(x){toast(x.message,1)}};return}
  const N=[['dash','Painel'],canM()&&['move','Retirada / devolução'],['tools','Ferramentas'],['boxes','Caixas'],['emps','Funcionários'],['hist','Relatórios'],isA()&&['users','Usuários'],isA()&&['audit','Auditoria']].filter(Boolean);
- A.innerHTML=`<div class="app"><nav><span class="ml"><picture><source media="(prefers-color-scheme: light)" srcset="${LOGOL}"><img src="${LOGOD}" alt="Ponto Trace"></picture></span><div class="logo"><picture><source media="(prefers-color-scheme: light)" srcset="${LOGOL}"><img src="${LOGOD}" alt="Ponto Trace"></picture><small>EMEC · almoxarifado</small></div>${N.map(n=>`<button class="${view===n[0]?'on':''}" onclick="view='${n[0]}';render()">${n[1]}</button>`).join('')}<button class="mo" onclick="logout()">Sair</button><div class="who"><b>${esc(me.full_name)}</b><br><span class="mu">${RO[me.role]}</span><br><button class="s g" style="margin-top:8px" onclick="logout()">Sair</button></div></nav><main>${V[view]()}</main></div>`;
+ A.innerHTML=`<div class="app"><div class="mbar"><button class="hb" aria-label="Abrir menu" onclick="mn(1)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 7h18M3 12h18M3 17h12"/></svg></button><span class="ml"><picture><source media="(prefers-color-scheme: light)" srcset="${LOGOL}"><img src="${LOGOD}" alt="Ponto Trace"></picture></span><span class="mt">${(N.find(n=>n[0]===view)||[])[1]||''}</span></div><div class="bk" onclick="mn(0)"></div><nav><button class="cl" aria-label="Fechar menu" onclick="mn(0)">✕</button><div class="logo"><picture><source media="(prefers-color-scheme: light)" srcset="${LOGOL}"><img src="${LOGOD}" alt="Ponto Trace"></picture><small>EMEC · almoxarifado</small></div>${N.map(n=>`<button class="${view===n[0]?'on':''}" onclick="view='${n[0]}';render()">${n[1]}</button>`).join('')}<div class="who"><b>${esc(me.full_name)}</b><br><span class="mu">${RO[me.role]}</span><br><button class="s g" style="margin-top:8px" onclick="logout()">Sair</button></div></nav><main>${V[view]()}</main></div>`;
  if(view==='tools')$('#qs').oninput=e=>{q=e.target.value;const p=e.target.selectionStart;render();const i=$('#qs');i.focus();i.setSelectionRange(p,p)};
  if(view==='move')moveInit()}
 function moveInit(){const sc=$('#sc'),mv=$('#mv');sc.focus();
