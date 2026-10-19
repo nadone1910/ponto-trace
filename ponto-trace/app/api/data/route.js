@@ -10,7 +10,7 @@ export async function GET() {
     q('select * from employees order by full_name'),
     q('select id,unique_id,name,category,brand,model,condition,status,holder_id as holder,box_id,active from tools order by unique_id'),
     q(`select id,tool_id,employee_id,user_id,type,condition_return,notes,${ms('m."timestamp"')} from movements m order by m."timestamp"`),
-    u.role === 'admin' ? q(`select * from (select id,user_id,action,target_entity,details,${ms('a."timestamp"')} from audit_logs a order by id desc limit 500) x order by id`) : [],
+    [],
   ]);
   return NextResponse.json({ me: { id: u.id, role: u.role, full_name: u.full_name }, users, boxes, employees, tools, movements, audit });
 }
