@@ -46,7 +46,38 @@ button,.btn{border-radius:10px}input,select,textarea{border-radius:10px}input:fo
 .scan{border-radius:14px;font-size:22px;letter-spacing:.04em}
 .hint{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 12px;max-width:760px}.hint button{white-space:nowrap}
 dialog{border-radius:16px}video{width:100%;border-radius:10px;background:#000}
-@media (max-width:760px){.app{grid-template-columns:1fr}nav{position:static;height:auto;flex-direction:row;flex-wrap:wrap;border-right:0;border-bottom:1px solid var(--bd);padding:8px}.logo,.who{display:none}main{padding:16px}}
+.mbar,.bk,.cl{display:none}
+@media (max-width:760px){
+.app{display:block}
+.mbar{display:flex;align-items:center;gap:4px;position:sticky;top:0;z-index:20;background:var(--pn);border-bottom:1px solid var(--bd);padding:6px 12px 6px 6px;padding-top:calc(6px + env(safe-area-inset-top,0px))}
+.hb{background:transparent;border:0;box-shadow:none;color:var(--tx);width:46px;padding:0;display:flex;align-items:center;justify-content:center}
+.ml{display:flex;padding:0 6px}.ml img{display:block;height:30px;width:auto;max-width:none}
+.mt{margin-left:auto;font-weight:650;font-size:15px;color:var(--mu)}
+.bk{display:block;position:fixed;inset:0;background:rgba(0,0,0,.62);opacity:0;pointer-events:none;transition:opacity .25s;z-index:40}
+.app.open .bk{opacity:1;pointer-events:auto}
+nav{position:fixed;top:0;bottom:0;left:0;height:auto;width:min(86vw,340px);z-index:50;flex-direction:column;align-items:stretch;gap:0;overflow-y:auto;transform:translateX(-102%);transition:transform .28s ease;border-right:1px solid var(--bd);border-bottom:0;background:var(--pn);padding:calc(22px + env(safe-area-inset-top,0px)) 24px calc(22px + env(safe-area-inset-bottom,0px))}
+.app.open nav{transform:none}
+nav .logo{display:block;padding:0 0 22px}nav .logo img{max-width:170px}
+nav .cl{display:block;position:absolute;top:calc(10px + env(safe-area-inset-top,0px));right:8px;width:46px;background:transparent;color:var(--tx);box-shadow:none;border:0;font-size:22px;padding:0}
+nav>button:not(.cl){font-size:24px;font-weight:700;letter-spacing:-.01em;padding:15px 0;min-height:0;border-bottom:1px solid var(--bd);border-radius:0;color:var(--tx);text-align:left;white-space:normal;flex:none}
+nav>button.on{background:none;box-shadow:none;color:var(--ac)}
+nav .who{display:block;margin-top:auto;padding-top:22px}
+main{padding:14px 14px calc(24px + env(safe-area-inset-bottom,0px))}
+h2{font-size:22px}
+.grid{grid-template-columns:repeat(2,1fr);gap:10px}.card .n{font-size:28px}
+.bar{flex-direction:column;align-items:stretch}.bar>*,.bar .grow{width:100%;flex:none}
+input,select,textarea{font-size:16px}button{min-height:44px}button.s{min-height:38px;padding:6px 12px}
+.scan{font-size:18px;padding:14px}.panel{max-width:100%}.hint{flex-direction:column;align-items:stretch}
+.tw{background:none;border:0;box-shadow:none;overflow:visible}
+table,tbody,tr,td{display:block;width:100%}thead{display:none}
+tr{background:var(--pn);border:1px solid var(--bd);border-radius:14px;padding:8px 14px;margin-bottom:10px}
+td{display:flex;justify-content:space-between;align-items:center;gap:12px;border:0;padding:5px 0;text-align:right}
+td::before{content:attr(data-l);color:var(--mu);font-size:12px;text-align:left;flex:0 0 36%}
+td[data-l=""]{justify-content:flex-start;padding-top:8px}td[data-l=""]::before{display:none}
+.acts{flex-wrap:wrap}
+dialog{width:94vw;max-height:88vh;overflow:auto;padding:16px}
+.login{margin:6vh auto}
+}
 #sheet{display:none}
 .lg{display:grid;grid-template-columns:repeat(4,46mm);gap:2mm;justify-content:start}#pv{display:block}
 .lab{width:46mm;height:22mm;padding:1mm 1.5mm;border:.2mm dashed #888;background:#fff;color:#000;text-align:center;overflow:hidden;box-sizing:border-box;break-inside:avoid}
@@ -79,7 +110,7 @@ async function load(){const j=await api('/api/data');me=j.me;delete j.me;db=j}
 async function init(){try{await load()}catch(e){me=null;db={users:[],boxes:[],employees:[],tools:[],movements:[],audit:[]}}render()}
 function logout(){api('/api/logout',{}).catch(()=>{}).finally(()=>{me=null;render()})}
 function loginHTML(){return`<div class="login"><div class="logo"><picture><source media="(prefers-color-scheme: light)" srcset="${LOGOL}"><img src="${LOGOD}" alt="Ponto Trace"></picture><small>EMEC · controle de ferramentas</small></div><div class="card"><form id="lf"><label>Usuário<input id="lu" autocomplete="username" autofocus></label><label>Senha<input id="lp" type="password" autocomplete="current-password"></label><button style="width:100%">Entrar</button></form></div></div>`}
-function tbl(h,r){return`<div class="tw"><table><thead><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${r.length?r.map(x=>`<tr>${x.map(c=>`<td>${c}</td>`).join('')}</tr>`).join(''):`<tr><td colspan="${h.length}" class="mu">Nenhum registro ainda.</td></tr>`}</tbody></table></div>`}
+function tbl(h,r){return`<div class="tw"><table><thead><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${r.length?r.map(x=>`<tr>${x.map((c,j)=>`<td data-l="${h[j]||''}">${c}</td>`).join('')}</tr>`).join(''):`<tr><td colspan="${h.length}" class="mu">Nenhum registro ainda.</td></tr>`}</tbody></table></div>`}
 function movRows(l){return l.slice().reverse().map(m=>{const t=by(db.tools,m.tool_id);return[fmt(m.timestamp),esc(t.unique_id)+' '+esc(t.name),esc(by(db.employees,m.employee_id).full_name||'—'),`<span class="b ac">${TY[m.type]}</span>`,esc(by(db.users,m.user_id).username),esc((m.condition_return?CO[m.condition_return][0]+' · ':'')+(m.notes||''))]})}
 const MH=['Data','Ferramenta','Funcionário','Tipo','Operador','Detalhes'];
 const V={
@@ -94,13 +125,21 @@ emps(){return`<h2>Funcionários</h2>${isA()?'<div class="bar"><button onclick="e
 hist(){const f=db.movements.filter(m=>(!H.emp||m.employee_id===H.emp)&&(!H.from||m.timestamp>=new Date(H.from+'T00:00').getTime())&&(!H.to||m.timestamp<=new Date(H.to+'T23:59:59').getTime()));window._f=f;
  return`<h2>Relatórios</h2><div class="bar"><label>Funcionário<select onchange="H.emp=this.value;render()"><option value="">Todos</option>${db.employees.map(e=>`<option value="${e.id}" ${H.emp===e.id?'selected':''}>${esc(e.full_name)}</option>`).join('')}</select></label><label>De<input type="date" value="${H.from}" onchange="H.from=this.value;render()"></label><label>Até<input type="date" value="${H.to}" onchange="H.to=this.value;render()"></label></div><div class="bar"><button class="g" onclick="exp('inv')">Exportar inventário</button><button class="g" onclick="exp('loan')">Exportar emprestadas</button><button class="g" onclick="exp('mov')">Exportar movimentações</button></div><h3>Emprestadas agora</h3>${tbl(['Ferramenta','Responsável'],db.tools.filter(t=>t.status==='loaned').map(t=>[esc(t.unique_id+' '+t.name),esc(by(db.employees,t.holder).full_name)]))}<h3>Movimentações</h3>${tbl(MH,movRows(f))}`},
 users(){return`<h2>Usuários</h2><p class="mu">Quem pode entrar no sistema. Administrador faz tudo, operador faz retiradas e devoluções, consulta só visualiza.</p><div class="bar"><button onclick="userForm()">Novo usuário</button></div>`+tbl(['Usuário','Nome','Perfil','Situação',''],db.users.map(x=>[`<b>${esc(x.username)}</b>`,esc(x.full_name),RO[x.role],x.active?'<span class="b ok">Ativo</span>':'<span class="b er">Inativo</span>',`<div class="acts"><button class="s g" onclick="userForm('${x.id}')">Editar</button>${x.id===me.id?'':`<button class="s r" onclick="tog('users','${x.id}')">${x.active?'Inativar':'Reativar'}</button>`}</div>`]))},
-audit(){return`<h2>Trilha de auditoria</h2><p class="mu">Registros não podem ser editados nem excluídos.</p>`+tbl(['Data','Usuário','Ação','Alvo','Detalhes'],db.audit.slice().reverse().map(a=>[fmt(a.timestamp),esc(by(db.users,a.user_id).username),`<span class="b ac">${esc(a.action)}</span>`,esc(a.target_entity),esc(a.details)]))}};
-function render(){const A=$('#app');
+audit(){return`<h2>Trilha de auditoria</h2><p class="mu">Registros não podem ser editados nem excluídos. A busca vale para todo o histórico.</p><div class="bar"><div class="grow"><label>Buscar<input id="aq" placeholder="Usuário, código, ação ou detalhe" value="${esc(AU.q)}" oninput="auS()"></label></div><label>Ação<select id="aa" onchange="auS(1)"><option value="">Todas</option></select></label><label>De<input id="af" type="date" value="${AU.from}" onchange="auS(1)"></label><label>Até<input id="at" type="date" value="${AU.to}" onchange="auS(1)"></label></div><div id="au" class="mu">Carregando…</div>`}};
+let AU={q:'',a:'',from:'',to:'',page:1},_at;
+async function auditLoad(){const el=$('#au');if(!el)return;const u=new URLSearchParams({q:AU.q,action:AU.a,from:AU.from,to:AU.to,page:AU.page});
+ try{const j=await api('/api/audit?'+u);if(view!=='audit')return;$('#aa').innerHTML='<option value="">Todas</option>'+j.actions.map(a=>`<option ${AU.a===a?'selected':''}>${esc(a)}</option>`).join('');
+  el.className='';el.innerHTML=`<p class="mu">${j.total} registro(s)${j.total?' · página '+j.page+' de '+j.pages:''}</p>`+tbl(['Data','Usuário','Ação','Alvo','Detalhes'],j.rows.map(a=>[fmt(a.ts),esc(a.username||'—'),`<span class="b ac">${esc(a.action)}</span>`,esc(a.target_entity||''),esc(a.details||'')]))+(j.pages>1?`<div class="bar"><button class="g" ${j.page<=1?'disabled':''} onclick="auP(${j.page-1})">Anterior</button><button class="g" ${j.page>=j.pages?'disabled':''} onclick="auP(${j.page+1})">Próxima</button></div>`:'')}
+ catch(x){el.textContent=x.message}}
+function auS(now){clearTimeout(_at);AU.q=$('#aq').value;AU.a=$('#aa').value;AU.from=$('#af').value;AU.to=$('#at').value;AU.page=1;if(now)auditLoad();else _at=setTimeout(auditLoad,350)}
+function auP(n){AU.page=n;auditLoad();scrollTo(0,0)}
+function mn(o){$('.app').classList.toggle('open',!!o);document.body.style.overflow=o?'hidden':''}
+function render(){const A=$('#app');document.body.style.overflow='';
  if(!me){A.innerHTML=loginHTML();$('#lf').onsubmit=async e=>{e.preventDefault();try{await api('/api/login',{username:$('#lu').value.trim(),password:$('#lp').value});await load();view='dash';render()}catch(x){toast(x.message,1)}};return}
  const N=[['dash','Painel'],canM()&&['move','Retirada / devolução'],['tools','Ferramentas'],['boxes','Caixas'],['emps','Funcionários'],['hist','Relatórios'],isA()&&['users','Usuários'],isA()&&['audit','Auditoria']].filter(Boolean);
- A.innerHTML=`<div class="app"><nav><div class="logo"><picture><source media="(prefers-color-scheme: light)" srcset="${LOGOL}"><img src="${LOGOD}" alt="Ponto Trace"></picture><small>EMEC · almoxarifado</small></div>${N.map(n=>`<button class="${view===n[0]?'on':''}" onclick="view='${n[0]}';render()">${n[1]}</button>`).join('')}<div class="who"><b>${esc(me.full_name)}</b><br><span class="mu">${RO[me.role]}</span><br><button class="s g" style="margin-top:8px" onclick="logout()">Sair</button></div></nav><main>${V[view]()}</main></div>`;
+ A.innerHTML=`<div class="app"><div class="mbar"><button class="hb" aria-label="Abrir menu" onclick="mn(1)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 7h18M3 12h18M3 17h12"/></svg></button><span class="ml"><picture><source media="(prefers-color-scheme: light)" srcset="${LOGOL}"><img src="${LOGOD}" alt="Ponto Trace"></picture></span><span class="mt">${(N.find(n=>n[0]===view)||[])[1]||''}</span></div><div class="bk" onclick="mn(0)"></div><nav><button class="cl" aria-label="Fechar menu" onclick="mn(0)">✕</button><div class="logo"><picture><source media="(prefers-color-scheme: light)" srcset="${LOGOL}"><img src="${LOGOD}" alt="Ponto Trace"></picture><small>EMEC · almoxarifado</small></div>${N.map(n=>`<button class="${view===n[0]?'on':''}" onclick="view='${n[0]}';render()">${n[1]}</button>`).join('')}<div class="who"><b>${esc(me.full_name)}</b><br><span class="mu">${RO[me.role]}</span><br><button class="s g" style="margin-top:8px" onclick="logout()">Sair</button></div></nav><main>${V[view]()}</main></div>`;
  if(view==='tools')$('#qs').oninput=e=>{q=e.target.value;const p=e.target.selectionStart;render();const i=$('#qs');i.focus();i.setSelectionRange(p,p)};
- if(view==='move')moveInit()}
+ if(view==='move')moveInit();if(view==='audit')auditLoad()}
 function moveInit(){const sc=$('#sc'),mv=$('#mv');sc.focus();
  sc.onkeydown=e=>{if(e.key!=='Enter')return;const c=sc.value.trim().toUpperCase();const t=db.tools.find(x=>x.unique_id===c);
   if(!t){mv.innerHTML=`<div class="card"><span class="b er">Não encontrada</span> Nenhuma ferramenta com o código ${esc(c)}.</div>`;sc.select();return}
